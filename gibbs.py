@@ -5,6 +5,8 @@ import argparse
 import sys
 import random
 from collections import Counter
+from time import sleep
+
 
 class Gibbs():
 
@@ -72,7 +74,7 @@ class Gibbs():
             parser.add_argument(evid, type=str, help='An evidence node value - Optional Value')
 
         parser.add_argument('-u', type=int, help='Number of Updates to be made')
-        parser.add_argument('-d', type=int, help='Number of Updates to ignore before computing probability')
+        parser.add_argument('-d', type=int, help='Number of Updates to ignore before computing probability', default = 0)
 
         args = parser.parse_args()
 
@@ -260,7 +262,7 @@ class Gibbs():
         elif node == 'schools':
             list_markov = ['location', 'children', 'size', 'age', 'price']
 
-        print ("Markov Blanket for  the node -- ", node," --",  "has the following nodes ", list_markov, "\n")
+#        print ("Markov Blanket for  the node -- ", node," --",  "has the following nodes ", list_markov, "\n")
 
         return list_markov
 
@@ -338,7 +340,7 @@ class Gibbs():
         '''Calculate the probability distribution for location node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
 
-        print ("\nCalculating the probability of the randomly selected --", "location", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "location", "--\n")
         _ = self.markov_Blanket('location')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
@@ -347,7 +349,6 @@ class Gibbs():
 
         prob_locationNewnoNorm, prob_locationNewNormal = {}, {}
         for loc_nodeOption in self.locOptions:
-            print(loc_nodeOption)
             prob_locationNewnoNorm[loc_nodeOption] = self.CPT_location(loc_nodeOption, totalList['amenities'], totalList['neighborhood'])\
                             *self.CPT_amentiies(totalList['amenities'])*self.CPT_neighbor(totalList['neighborhood'])*\
                             self.CPT_size(totalList['size'])*self.CPT_schools(totalList['schools'], totalList['children'])\
@@ -359,11 +360,10 @@ class Gibbs():
         for key in list(prob_locationNewnoNorm.keys()):
             prob_locationNewNormal[key] = prob_locationNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- Location -- node without normalization", prob_locationNewnoNorm)
-        print ("Probability distribution of the -- Location -- node with normalization", prob_locationNewNormal)
+#        print ("Probability distribution of the -- Location -- node without normalization", prob_locationNewnoNorm)
+#        print ("Probability distribution of the -- Location -- node with normalization", prob_locationNewNormal)
         
         Update_value = np.random.choice(['good','bad','ugly'],p=[prob_locationNewNormal['good'],prob_locationNewNormal['bad'],prob_locationNewNormal['ugly']])
-        print(Update_value)
         return Update_value
 
 
@@ -372,12 +372,12 @@ class Gibbs():
         '''Calculate the probability distribution for amenities node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "amenities", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "amenities", "--\n")
         _ = self.markov_Blanket('amenities')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['amenities'])
+#        print(totalList['amenities'])
         #print ("Complete List -- ", totalList)
 
         prob_amenitiesNewnoNorm, prob_amenitiesNewNormal = {}, {}
@@ -390,11 +390,10 @@ class Gibbs():
         for key in list(prob_amenitiesNewnoNorm.keys()):
             prob_amenitiesNewNormal[key] = prob_amenitiesNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- amenities -- node without normalization", prob_amenitiesNewnoNorm)
-        print ("Probability distribution of the -- amenities -- node with normalization", prob_amenitiesNewNormal)
+#        print ("Probability distribution of the -- amenities -- node without normalization", prob_amenitiesNewnoNorm)
+#        print ("Probability distribution of the -- amenities -- node with normalization", prob_amenitiesNewNormal)
         
         Update_value = np.random.choice(['lots','little'],p=[prob_amenitiesNewNormal['lots'],prob_amenitiesNewNormal['little']])
-        print(Update_value)
         return Update_value
 
     def probability_neighborhood(self, nonevidList, inpevidenceList):
@@ -402,12 +401,12 @@ class Gibbs():
         '''Calculate the probability distribution for neighborhood node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "neighborhood", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "neighborhood", "--\n")
         _ = self.markov_Blanket('neighborhood')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['neighborhood'])
+#        print(totalList['neighborhood'])
         #print ("Complete List -- ", totalList)
 
         prob_neighborhoodNewnoNorm, prob_neighborhoodNewNormal = {}, {}
@@ -421,24 +420,22 @@ class Gibbs():
         for key in list(prob_neighborhoodNewnoNorm.keys()):
             prob_neighborhoodNewNormal[key] = prob_neighborhoodNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- neighborhood -- node without normalization", prob_neighborhoodNewnoNorm)
-        print ("Probability distribution of the -- neighborhood -- node with normalization", prob_neighborhoodNewNormal)
+#        print ("Probability distribution of the -- neighborhood -- node without normalization", prob_neighborhoodNewnoNorm)
+#        print ("Probability distribution of the -- neighborhood -- node with normalization", prob_neighborhoodNewNormal)
         
         Update_value = np.random.choice(['bad','good'],p=[prob_neighborhoodNewNormal['bad'],prob_neighborhoodNewNormal['good']])
-        print(Update_value)
         return Update_value
 
     def probability_size(self, nonevidList, inpevidenceList):
 
-        '''Calculate the probability distribution for size node based on Markov Blanket and then
+        '''Calculate the probability dis\ntribution for size node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "size", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "size", "--\n")
         _ = self.markov_Blanket('size')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['size'])
         #print ("Complete List -- ", totalList)
 
         prob_sizeNewnoNorm, prob_sizeNewNormal = {}, {}
@@ -453,11 +450,10 @@ class Gibbs():
         for key in list(prob_sizeNewnoNorm.keys()):
             prob_sizeNewNormal[key] = prob_sizeNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- size -- node without normalization", prob_sizeNewnoNorm)
-        print ("Probability distribution of the -- size -- node with normalization", prob_sizeNewNormal)
+#        print ("Probability distribution of the -- size -- node without normalization", prob_sizeNewnoNorm)
+#        print ("Probability distribution of the -- size -- node with normalization", prob_sizeNewNormal)
         
         Update_value = np.random.choice(['small','medium','large'],p=[prob_sizeNewNormal['small'],prob_sizeNewNormal['medium'],prob_sizeNewNormal['large']])
-        print(Update_value)
         return Update_value
     
     def probability_children(self, nonevidList, inpevidenceList):
@@ -465,12 +461,12 @@ class Gibbs():
         '''Calculate the probability distribution for children node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "children", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "children", "--\n")
         _ = self.markov_Blanket('children')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['children'])
+#        print(totalList['children'])
         #print ("Complete List -- ", totalList)
 
         prob_childrenNewnoNorm, prob_childrenNewNormal = {}, {}
@@ -482,25 +478,25 @@ class Gibbs():
         summ = sum(list(prob_childrenNewnoNorm.values()))
         for key in list(prob_childrenNewnoNorm.keys()):
             prob_childrenNewNormal[key] = prob_childrenNewnoNorm[key]/summ
-
-        print ("Probability distribution of the -- children -- node without normalization", prob_childrenNewnoNorm)
-        print ("Probability distribution of the -- children -- node with normalization", prob_childrenNewNormal)
+#
+#        print ("Probability distribution of the -- children -- node without normalization", prob_childrenNewnoNorm)
+#        print ("Probability distribution of the -- children -- node with normalization", prob_childrenNewNormal)
         
         Update_value = np.random.choice(['bad','good'],p=[prob_childrenNewNormal['bad'],prob_childrenNewNormal['good']])
-        print(Update_value)
         return Update_value
     
     def probability_schools(self, nonevidList, inpevidenceList):
 
         '''Calculate the probability distribution for schools node based on Markov Blanket and then
-           normalizing it to get it within the 0-1 range '''
+           normalizing it to get it with        print ("Probability distribution of the -- schools -- node without normalization", prob_schoolsNewnoNorm)
+        print ("Probability distribution of the -- schools -- node with normalization", prob_schoolsNewNormal)in the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "schools", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "schools", "--\n")
         _ = self.markov_Blanket('schools')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['schools'])
+#        print(totalList['schools'])
         #print ("Complete List -- ", totalList)
 
         prob_schoolsNewnoNorm, prob_schoolsNewNormal = {}, {}
@@ -517,11 +513,10 @@ class Gibbs():
         for key in list(prob_schoolsNewnoNorm.keys()):
             prob_schoolsNewNormal[key] = prob_schoolsNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- schools -- node without normalization", prob_schoolsNewnoNorm)
-        print ("Probability distribution of the -- schools -- node with normalization", prob_schoolsNewNormal)
+#        print ("Probability distribution of the -- schools -- node without normalization", prob_schoolsNewnoNorm)
+#        print ("Probability distribution of the -- schools -- node with normalization", prob_schoolsNewNormal)
         
         Update_value = np.random.choice(['bad','good'],p=[prob_schoolsNewNormal['bad'],prob_schoolsNewNormal['good']])
-        print(Update_value)
         return Update_value
 
     def probability_age(self, nonevidList, inpevidenceList):
@@ -529,12 +524,12 @@ class Gibbs():
         '''Calculate the probability distribution for age node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "age", "--\n")
+#        print ("\nCalculating the probability of the randomly selected --", "age", "--\n")
         _ = self.markov_Blanket('age')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['age'])
+#        print(totalList['age'])
         #print ("Complete List -- ", totalList)
 
         prob_ageNewnoNorm, prob_ageNewNormal = {}, {}
@@ -549,11 +544,10 @@ class Gibbs():
         for key in list(prob_ageNewnoNorm.keys()):
             prob_ageNewNormal[key] = prob_ageNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- age -- node without normalization", prob_ageNewnoNorm)
-        print ("Probability distribution of the -- age -- node with normalization", prob_ageNewNormal)
+        #print ("Probability distribution of the -- age -- node without normalization", prob_ageNewnoNorm)
+        #print ("Probability distribution of the -- age -- node with normalization", prob_ageNewNormal)
         
         Update_value = np.random.choice(['old','new'],p=[prob_ageNewNormal['old'],prob_ageNewNormal['new']])
-        print(Update_value)
         return Update_value
 
     def probability_price(self, nonevidList, inpevidenceList):
@@ -561,12 +555,12 @@ class Gibbs():
         '''Calculate the probability distribution for price node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
         
-        print ("\nCalculating the probability of the randomly selected --", "price", "--\n")
+        #print ("\nCalculating the probability of the randomly selected --", "price", "--\n")
         _ = self.markov_Blanket('price')
 
         nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print(totalList['price'])
+#        print(totalList['price'])
         #print ("Complete List -- ", totalList)
 
         prob_priceNewnoNorm, prob_priceNewNormal = {}, {}
@@ -580,64 +574,74 @@ class Gibbs():
         for key in list(prob_priceNewnoNorm.keys()):
             prob_priceNewNormal[key] = prob_priceNewnoNorm[key]/summ
 
-        print ("Probability distribution of the -- price -- node without normalization", prob_priceNewnoNorm)
-        print ("Probability distribution of the -- price -- node with normalization", prob_priceNewNormal)
+        #print ("Probability distribution of the -- price -- node without normalization", prob_priceNewnoNorm)
+        #print ("Probability distribution of the -- price -- node with normalization", prob_priceNewNormal)
         
         Update_value = np.random.choice(['cheap','ok','expensive'],p=[prob_priceNewNormal['cheap'],prob_priceNewNormal['ok'],prob_priceNewNormal['expensive']])
-        print(Update_value)
         return Update_value
     
-    def calculate_probability(self, checkingNode):
+    def calculate_probability(self):
+        
+        checkingNode = self.QueryNode
         if checkingNode == 'amenities':
-            stateList = Counter(self.amenitiesStates.values())
+            
+            ''' Magic line: ignores the given no. of initial observations (defaults to 0 if value not given) 
+                     [note: list does not need to be sorted, but can be sorted if required]'''
+            stateList = Counter({k: self.amenitiesStates[k] for k in list(self.amenitiesStates)[self.numSampleIgnr:]}.values())
+            
+            #Normalizing the readings to obtain probability of state
             lots = stateList['lots']/(stateList['lots']+stateList['little'])
             little = stateList['little']/(stateList['lots']+stateList['little'])
-            print('Probabilities of states of node Amenities are -- lots: ',lots,'  little: ',little)
+            print('Probabilities of states of node -Amenities- are --> \nlots: ',lots,'  \nlittle: ',little)
             
         elif checkingNode == 'neighborhood':
-            stateList = Counter(self.neighborhoodStates.values())
+            
+            stateList = Counter({k: self.checkingStates[k] for k in list(self.checkingStates)[self.numSampleIgnr:]}.values())
             bad = stateList['bad']/(stateList['bad']+stateList['good'])
             good = stateList['good']/(stateList['bad']+stateList['good'])
-            print('Probabilities of states of node neighborhood are -- bad: ',bad,'  good: ',good)
+            print('Probabilities of states of node -neighborhood- are --> \nbad: ',bad,'  \ngood: ',good)
         
         elif checkingNode == 'location':
-            stateList = Counter(self.locationStates.values())
+            
+            stateList = Counter({k: self.locationStates[k] for k in list(self.locationStates)[self.numSampleIgnr:]}.values())
             bad = stateList['bad']/(stateList['bad']+stateList['good']+stateList['ugly'])
             good = stateList['good']/(stateList['bad']+stateList['good']+stateList['ugly'])
             ugly = stateList['ugly']/(stateList['bad']+stateList['good']+stateList['ugly'])
-            print('Probabilities of states of node location are -- bad: ',bad,'  good: ',good, 'ugly: ',ugly)
+            print('Probabilities of states of node -location- are --> \nbad: ',bad,'  \ngood: ',good, '\nugly: ',ugly)
 
         elif checkingNode == 'children':
-            stateList = Counter(self.childrenStates.values())
+            
+            stateList = Counter({k: self.childrenStates[k] for k in list(self.childrenStates)[self.numSampleIgnr:]}.values())
             bad = stateList['bad']/(stateList['bad']+stateList['good'])
             good = stateList['good']/(stateList['bad']+stateList['good'])
-            print('Probabilities of states of node children are -- bad: ',bad,'  good: ',good)
+            print('Probabilities of states of node -children- are --> \nbad: ',bad,'  \ngood: ',good)
             
         elif checkingNode == 'size':
-            stateList = Counter(self.sizeStates.values())
+            
+            stateList = Counter({k: self.sizeStates[k] for k in list(self.sizeStates)[self.numSampleIgnr:]}.values())
             small = stateList['small']/(stateList['small']+stateList['medium']+stateList['large'])
             medium = stateList['medium']/(stateList['small']+stateList['medium']+stateList['large'])
             large = stateList['large']/(stateList['small']+stateList['medium']+stateList['large'])
-            print('Probabilities of states of node size are -- small: ',small,'  medium: ',medium, 'large: ',large)
+            print('Probabilities of states of node -size- are --> \nsmall: ',small,'  \nmedium: ',medium, '\nlarge: ',large)
             
         elif checkingNode == 'schools':
-            stateList = Counter(self.schoolsStates.values())
+            stateList = Counter({k: self.schoolsStates[k] for k in list(self.schoolsStates)[self.numSampleIgnr:]}.values())
             bad = stateList['bad']/(stateList['bad']+stateList['good'])
             good = stateList['good']/(stateList['bad']+stateList['good'])
-            print('Probabilities of states of node schools are -- bad: ',bad,'  good: ',good)
+            print('Probabilities of states of node -schools- are --> \nbad: ',bad,'  \ngood: ',good)
  
         elif checkingNode == 'age':
-            stateList = Counter(self.childrenStates.values())
+            stateList = Counter({k: self.ageStates[k] for k in list(self.ageStates)[self.numSampleIgnr:]}.values())
             old = stateList['old']/(stateList['old']+stateList['new'])
             new = stateList['new']/(stateList['old']+stateList['new'])
-            print('Probabilities of states of node children are -- old: ',old,'  new: ',new) 
+            print('Probabilities of states of node -children- are --> \nold: ',old,'  \nnew: ',new) 
             
         elif checkingNode == 'price':
-            stateList = Counter(self.priceStates.values())
+            stateList = Counter({k: self.priceStates[k] for k in list(self.priceStates)[self.numSampleIgnr:]}.values())
             cheap = stateList['cheap']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
             ok = stateList['ok']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
             expensive = stateList['expensive']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
-            print('Probabilities of states of node price are -- cheap: ',cheap,'  ok: ',ok, 'expensive: ',expensive)
+            print('Probabilities of states of node -price- are --> \ncheap: ',cheap,'  \nok: ',ok, '\nexpensive: ',expensive)
         
         
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
@@ -660,17 +664,35 @@ def main():
     print ("Number of updates  -- ", numUpdates)
     print ("Number of initial samples to ignore -- ", numSampleIgnr )
     print ("---------------\n")
-    print(list(nonevidList.values()))
     
-    for counter in range(0,numUpdates):
+    '''Iterating over the non-evidence nodes for length of times defined by user'''
+    IterationTimes = numUpdates
+
+    print("Iterating over non-evidence nodes for ",IterationTimes," iterations, Updating probabilities of non-evidence nodes and sampling the states\n")
+    print ("---------------\n")
+    
+    for counter in range(0,IterationTimes):
+
+        #Temporary nodelist to keep track of iterated nodes and prevent multiple iterations in a single loop
         iterated_nodeList = {} 
+        
+        #Checks length of temporary list to match it with the main list, equal length means iteration over all non-evidence nodes is complete
         while (len(list(iterated_nodeList)) != allValues_length):
+            
+            #Select a random node based on random probability, eventually iterate through all nodes with the loop
             randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
             if not randomNode in iterated_nodeList.keys():
                 iterated_nodeList[randomNode] = 'status: iterated'
+                
                 if randomNode== 'amenities':
+                    
+                    #Generates new "state" for the selected node, based on updated probabilities
                     New_Node_Val = gibbs_obj.probability_amenities(nonevidList, inpevidenceList)
+                    
+                    #Update the main dictionary containing all node states
                     nonevidList[randomNode] = New_Node_Val
+                    
+                    #Append the result to a cumulitive dictionary to keep track of all states received so far
                     gibbs_obj.amenitiesStates[counter] = New_Node_Val
                     
                 elif randomNode== 'neighborhood':
@@ -686,7 +708,7 @@ def main():
                 elif randomNode== 'size':
                     New_Node_Val = gibbs_obj.probability_size(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
-                    gibbs_obj.sizeStates[counter] = New_Node_Val
+                    gibbs_obj.sizeStates[counter] = New_Node_Val         
                     
                 elif randomNode== 'children':
                     New_Node_Val = gibbs_obj.probability_children(nonevidList, inpevidenceList)
@@ -702,15 +724,16 @@ def main():
                     New_Node_Val = gibbs_obj.probability_age(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
                     gibbs_obj.ageStates[counter] = New_Node_Val
-                    
+
                 elif randomNode== 'price':
                     New_Node_Val = gibbs_obj.probability_price(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
                     gibbs_obj.priceStates[counter] = New_Node_Val
-    
-    print(iterated_nodeList)
-    print(nonevidList)   
-    probabilities = gibbs_obj.calculate_probability(QueryNode)
+        #print('Iteration: ',counter,'\n')
+        
+    #Final function which calculates probability based on states recorded of the query node
+    gibbs_obj.calculate_probability()
+
 main()
 
     
