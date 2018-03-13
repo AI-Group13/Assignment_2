@@ -203,7 +203,6 @@ class Gibbs():
             prob_price = {'cheap':0.75 , 'ok':0.24 , 'expensive':0.01}
         elif locs == 'ugly' and ag == 'old' and sch =='bad' and siz == 'large':
             prob_price = {'cheap':0.75 , 'ok':0.23 , 'expensive':0.02}
-
         elif locs == 'ugly' and ag == 'old' and sch =='good' and siz == 'small':
                 prob_price = {'cheap':0.65 , 'ok':0.3 , 'expensive':0.05}
         elif locs == 'ugly' and ag == 'old' and sch =='good' and siz == 'medium':
@@ -357,7 +356,7 @@ class Gibbs():
         return Update_value
 
 
-    def amenities_location(self, nonevidList, inpevidenceList):
+    def probability_amenities(self, nonevidList, inpevidenceList):
 
         '''Calculate the probability distribution for amenities node based on Markov Blanket and then
            normalizing it to get it within the 0-1 range '''
@@ -386,6 +385,70 @@ class Gibbs():
         Update_value = np.random.choice(['lots','little'],p=[prob_amenitiesNewNormal['lots'],prob_amenitiesNewNormal['little']])
         print(Update_value)
         return Update_value
+
+    def probability_neighborhood(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for neighborhood node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "neighborhood", "--\n")
+        _ = self.markov_Blanket('neighborhood')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['neighborhood'])
+        #print ("Complete List -- ", totalList)
+
+        prob_neighborhoodNewnoNorm, prob_neighborhoodNewNormal = {}, {}
+        for neigh_nodeOption in self.neighOptions:
+            prob_neighborhoodNewnoNorm[neigh_nodeOption] = self.CPT_neighbor(neigh_nodeOption)*self.CPT_children(totalList['children'],neigh_nodeOption)\
+                                                            *self.CPT_location(totalList['location'],totalList['amenities'],neigh_nodeOption)\
+                                                            *self.CPT_amentiies(totalList['amenities'])
+        
+        #p(location|neighborhood,neighborhood)*p()
+        summ = sum(list(prob_neighborhoodNewnoNorm.values()))
+        for key in list(prob_neighborhoodNewnoNorm.keys()):
+            prob_neighborhoodNewNormal[key] = prob_neighborhoodNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- neighborhood -- node without normalization", prob_neighborhoodNewnoNorm)
+        print ("Probability distribution of the -- neighborhood -- node with normalization", prob_neighborhoodNewNormal)
+        
+        Update_value = np.random.choice(['bad','good'],p=[prob_neighborhoodNewNormal['bad'],prob_neighborhoodNewNormal['good']])
+        print(Update_value)
+        return Update_value
+
+    def probability_size(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for size node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "size", "--\n")
+        _ = self.markov_Blanket('size')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['size'])
+        #print ("Complete List -- ", totalList)
+
+        prob_sizeNewnoNorm, prob_sizeNewNormal = {}, {}
+        for size_nodeOption in self.sizeOptions:
+            prob_sizeNewnoNorm[size_nodeOption] = self.CPT_size(size_nodeOption)*self.CPT_price(totalList['price'], totalList['location'], totalList['age']\
+                              ,totalList['schools'],size_nodeOption)*self.CPT_age(totalList['age'],totalList['location'])\
+                              *self.CPT_location(totalList['location'],totalList['amenities'],totalList['neighborhood'])*\
+                              self.CPT_schools(totalList['schools'],totalList['children'])
+        
+        #p(location|size,size)*p()
+        summ = sum(list(prob_sizeNewnoNorm.values()))
+        for key in list(prob_sizeNewnoNorm.keys()):
+            prob_sizeNewNormal[key] = prob_sizeNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- size -- node without normalization", prob_sizeNewnoNorm)
+        print ("Probability distribution of the -- size -- node with normalization", prob_sizeNewNormal)
+        
+        Update_value = np.random.choice(['small','medium','large'],p=[prob_sizeNewNormal['small'],prob_sizeNewNormal['medium'],prob_sizeNewNormal['large']])
+        print(Update_value)
+        return Update_value
+    
 
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
 
@@ -417,9 +480,9 @@ def main():
 #            iterated_nodeList[randomNode] = 'node'
         
     randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
-    randomNode = 'amenities'
-    if randomNode== 'amenities':
-        New_Node_Val = gibbs_obj.amenities_location(nonevidList, inpevidenceList)
+    randomNode = 'size'
+    if randomNode== 'size':
+        New_Node_Val = gibbs_obj.probability_size(nonevidList, inpevidenceList)
         nonevidList[randomNode] = New_Node_Val
         
 main()
