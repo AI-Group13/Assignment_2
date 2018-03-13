@@ -404,7 +404,7 @@ class Gibbs():
             prob_neighborhoodNewnoNorm[neigh_nodeOption] = self.CPT_neighbor(neigh_nodeOption)*self.CPT_children(totalList['children'],neigh_nodeOption)\
                                                             *self.CPT_location(totalList['location'],totalList['amenities'],neigh_nodeOption)\
                                                             *self.CPT_amentiies(totalList['amenities'])
-        
+                                                            
         #p(location|neighborhood,neighborhood)*p()
         summ = sum(list(prob_neighborhoodNewnoNorm.values()))
         for key in list(prob_neighborhoodNewnoNorm.keys()):
@@ -449,7 +449,132 @@ class Gibbs():
         print(Update_value)
         return Update_value
     
+    def probability_children(self, nonevidList, inpevidenceList):
 
+        '''Calculate the probability distribution for children node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "children", "--\n")
+        _ = self.markov_Blanket('children')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['children'])
+        #print ("Complete List -- ", totalList)
+
+        prob_childrenNewnoNorm, prob_childrenNewNormal = {}, {}
+        for children_nodeOption in self.childOptions:
+            prob_childrenNewnoNorm[children_nodeOption] = self.CPT_children(children_nodeOption,totalList['neighborhood'])*self.CPT_neighbor(totalList['neighborhood'])\
+                                  *self.CPT_schools(totalList['schools'],children_nodeOption)
+            
+        #p(location|children,children)*p()
+        summ = sum(list(prob_childrenNewnoNorm.values()))
+        for key in list(prob_childrenNewnoNorm.keys()):
+            prob_childrenNewNormal[key] = prob_childrenNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- children -- node without normalization", prob_childrenNewnoNorm)
+        print ("Probability distribution of the -- children -- node with normalization", prob_childrenNewNormal)
+        
+        Update_value = np.random.choice(['bad','good'],p=[prob_childrenNewNormal['bad'],prob_childrenNewNormal['good']])
+        print(Update_value)
+        return Update_value
+    
+    def probability_schools(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for schools node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "schools", "--\n")
+        _ = self.markov_Blanket('schools')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['schools'])
+        #print ("Complete List -- ", totalList)
+
+        prob_schoolsNewnoNorm, prob_schoolsNewNormal = {}, {}
+        for schools_nodeOption in self.schooOptions:
+            prob_schoolsNewnoNorm[schools_nodeOption] = self.CPT_schools(schools_nodeOption,totalList['children'])*\
+                                                        self.CPT_children(totalList['children'],totalList['neighborhood'])*\
+                                                        self.CPT_price(totalList['price'], totalList['location'], totalList['age'],schools_nodeOption,totalList['size'])\
+                                                        *self.CPT_age(totalList['age'], totalList['location'])* self.CPT_location(totalList['location'], totalList['amenities'], totalList['neighborhood'])\
+                                                        *self.CPT_size(totalList['size'])
+        
+            
+        #p(location|schools,schools)*p()
+        summ = sum(list(prob_schoolsNewnoNorm.values()))
+        for key in list(prob_schoolsNewnoNorm.keys()):
+            prob_schoolsNewNormal[key] = prob_schoolsNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- schools -- node without normalization", prob_schoolsNewnoNorm)
+        print ("Probability distribution of the -- schools -- node with normalization", prob_schoolsNewNormal)
+        
+        Update_value = np.random.choice(['bad','good'],p=[prob_schoolsNewNormal['bad'],prob_schoolsNewNormal['good']])
+        print(Update_value)
+        return Update_value
+
+    def probability_age(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for age node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "age", "--\n")
+        _ = self.markov_Blanket('age')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['age'])
+        #print ("Complete List -- ", totalList)
+
+        prob_ageNewnoNorm, prob_ageNewNormal = {}, {}
+        for age_nodeOption in self.ageOptions:
+            prob_ageNewnoNorm[age_nodeOption] = self.CPT_age(age_nodeOption, totalList['location'])*self.CPT_location(totalList['location'],totalList['amenities'],totalList['neighborhood'])\
+                                                *self.CPT_price(totalList['price'], totalList['location'], age_nodeOption,totalList['schools'],totalList['size'])*\
+                                                self.CPT_size(totalList['size'])*self.CPT_schools(totalList['schools'], totalList['children'])
+        
+            
+        #p(location|age,age)*p()
+        summ = sum(list(prob_ageNewnoNorm.values()))
+        for key in list(prob_ageNewnoNorm.keys()):
+            prob_ageNewNormal[key] = prob_ageNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- age -- node without normalization", prob_ageNewnoNorm)
+        print ("Probability distribution of the -- age -- node with normalization", prob_ageNewNormal)
+        
+        Update_value = np.random.choice(['old','new'],p=[prob_ageNewNormal['old'],prob_ageNewNormal['new']])
+        print(Update_value)
+        return Update_value
+
+    def probability_price(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for price node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "price", "--\n")
+        _ = self.markov_Blanket('price')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['price'])
+        #print ("Complete List -- ", totalList)
+
+        prob_priceNewnoNorm, prob_priceNewNormal = {}, {}
+        for price_nodeOption in self.priceOptions:
+            prob_priceNewnoNorm[price_nodeOption] = self.CPT_price(price_nodeOption, totalList['location'], totalList['age'],totalList['schools'],totalList['size'])*\
+                                                    self.CPT_age(totalList['age'], totalList['location'])*self.CPT_location(totalList['location'],totalList['amenities'],totalList['neighborhood'])\
+                                                    *self.CPT_size(totalList['size'])*self.CPT_schools(totalList['schools'], totalList['children'])
+            
+        #p(location|price,price)*p()
+        summ = sum(list(prob_priceNewnoNorm.values()))
+        for key in list(prob_priceNewnoNorm.keys()):
+            prob_priceNewNormal[key] = prob_priceNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- price -- node without normalization", prob_priceNewnoNorm)
+        print ("Probability distribution of the -- price -- node with normalization", prob_priceNewNormal)
+        
+        Update_value = np.random.choice(['cheap','ok','expensive'],p=[prob_priceNewNormal['cheap'],prob_priceNewNormal['ok'],prob_priceNewNormal['expensive']])
+        print(Update_value)
+        return Update_value
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
 
 def main():
@@ -480,9 +605,9 @@ def main():
 #            iterated_nodeList[randomNode] = 'node'
         
     randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
-    randomNode = 'size'
-    if randomNode== 'size':
-        New_Node_Val = gibbs_obj.probability_size(nonevidList, inpevidenceList)
+    randomNode = 'price'
+    if randomNode== 'price':
+        New_Node_Val = gibbs_obj.probability_price(nonevidList, inpevidenceList)
         nonevidList[randomNode] = New_Node_Val
         
 main()
