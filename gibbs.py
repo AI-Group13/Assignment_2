@@ -4,6 +4,7 @@ import numpy as np
 import argparse
 import sys
 import random
+from collections import Counter
 
 class Gibbs():
 
@@ -49,6 +50,16 @@ class Gibbs():
         self.schooOptions = ['bad', 'good']
         self.ageOptions = ['old', 'new']
         self.allNodes = ['location', 'age', 'schools', 'children', 'neighborhood', 'price', 'size', 'amenities']
+        
+        self.locationStates = {}
+        self.neighborhoodStates = {}
+        self.amenitiesStates = {}
+        self.childrenStates = {}
+        self.sizeStates = {}
+        self.schoolsStates = {}
+        self.ageStates = {}
+        self.priceStates = {}
+        
 
     def read_argument(self):
 
@@ -575,6 +586,60 @@ class Gibbs():
         Update_value = np.random.choice(['cheap','ok','expensive'],p=[prob_priceNewNormal['cheap'],prob_priceNewNormal['ok'],prob_priceNewNormal['expensive']])
         print(Update_value)
         return Update_value
+    
+    def calculate_probability(self, checkingNode):
+        if checkingNode == 'amenities':
+            stateList = Counter(self.amenitiesStates.values())
+            lots = stateList['lots']/(stateList['lots']+stateList['little'])
+            little = stateList['little']/(stateList['lots']+stateList['little'])
+            print('Probabilities of states of node Amenities are -- lots: ',lots,'  little: ',little)
+            
+        elif checkingNode == 'neighborhood':
+            stateList = Counter(self.neighborhoodStates.values())
+            bad = stateList['bad']/(stateList['bad']+stateList['good'])
+            good = stateList['good']/(stateList['bad']+stateList['good'])
+            print('Probabilities of states of node neighborhood are -- bad: ',bad,'  good: ',good)
+        
+        elif checkingNode == 'location':
+            stateList = Counter(self.locationStates.values())
+            bad = stateList['bad']/(stateList['bad']+stateList['good']+stateList['ugly'])
+            good = stateList['good']/(stateList['bad']+stateList['good']+stateList['ugly'])
+            ugly = stateList['ugly']/(stateList['bad']+stateList['good']+stateList['ugly'])
+            print('Probabilities of states of node location are -- bad: ',bad,'  good: ',good, 'ugly: ',ugly)
+
+        elif checkingNode == 'children':
+            stateList = Counter(self.childrenStates.values())
+            bad = stateList['bad']/(stateList['bad']+stateList['good'])
+            good = stateList['good']/(stateList['bad']+stateList['good'])
+            print('Probabilities of states of node children are -- bad: ',bad,'  good: ',good)
+            
+        elif checkingNode == 'size':
+            stateList = Counter(self.sizeStates.values())
+            small = stateList['small']/(stateList['small']+stateList['medium']+stateList['large'])
+            medium = stateList['medium']/(stateList['small']+stateList['medium']+stateList['large'])
+            large = stateList['large']/(stateList['small']+stateList['medium']+stateList['large'])
+            print('Probabilities of states of node size are -- small: ',small,'  medium: ',medium, 'large: ',large)
+            
+        elif checkingNode == 'schools':
+            stateList = Counter(self.schoolsStates.values())
+            bad = stateList['bad']/(stateList['bad']+stateList['good'])
+            good = stateList['good']/(stateList['bad']+stateList['good'])
+            print('Probabilities of states of node schools are -- bad: ',bad,'  good: ',good)
+ 
+        elif checkingNode == 'age':
+            stateList = Counter(self.childrenStates.values())
+            old = stateList['old']/(stateList['old']+stateList['new'])
+            new = stateList['new']/(stateList['old']+stateList['new'])
+            print('Probabilities of states of node children are -- old: ',old,'  new: ',new) 
+            
+        elif checkingNode == 'price':
+            stateList = Counter(self.priceStates.values())
+            cheap = stateList['cheap']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
+            ok = stateList['ok']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
+            expensive = stateList['expensive']/(stateList['cheap']+stateList['ok']+stateList['expensive'])
+            print('Probabilities of states of node price are -- cheap: ',cheap,'  ok: ',ok, 'expensive: ',expensive)
+        
+        
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
 
 def main():
@@ -606,37 +671,46 @@ def main():
                 if randomNode== 'amenities':
                     New_Node_Val = gibbs_obj.probability_amenities(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.amenitiesStates[counter] = New_Node_Val
                     
                 elif randomNode== 'neighborhood':
                     New_Node_Val = gibbs_obj.probability_neighborhood(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.neighborhoodStates[counter] = New_Node_Val
                     
                 elif randomNode== 'location':
                     New_Node_Val = gibbs_obj.probability_location(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.locationStates[counter] = New_Node_Val
                     
                 elif randomNode== 'size':
                     New_Node_Val = gibbs_obj.probability_size(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.sizeStates[counter] = New_Node_Val
                     
                 elif randomNode== 'children':
                     New_Node_Val = gibbs_obj.probability_children(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.childrenStates[counter] = New_Node_Val
                     
                 elif randomNode== 'schools':
                     New_Node_Val = gibbs_obj.probability_schools(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.schoolsStates[counter] = New_Node_Val
                     
                 elif randomNode== 'age':
                     New_Node_Val = gibbs_obj.probability_age(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.ageStates[counter] = New_Node_Val
                     
                 elif randomNode== 'price':
                     New_Node_Val = gibbs_obj.probability_price(nonevidList, inpevidenceList)
                     nonevidList[randomNode] = New_Node_Val
+                    gibbs_obj.priceStates[counter] = New_Node_Val
+    
     print(iterated_nodeList)
     print(nonevidList)   
-        
+    probabilities = gibbs_obj.calculate_probability(QueryNode)
 main()
 
     
