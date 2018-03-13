@@ -605,7 +605,7 @@ def main():
                 iterated_nodeList[randomNode] = 'status: iterated'
                 if randomNode== 'amenities':
                     New_Node_Val = gibbs_obj.probability_amenities(nonevidList, inpevidenceList)
-                    nonevidList[randomNode] 
+                    nonevidList[randomNode] = New_Node_Val
                     
                 elif randomNode== 'neighborhood':
                     New_Node_Val = gibbs_obj.probability_neighborhood(nonevidList, inpevidenceList)
