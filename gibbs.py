@@ -331,28 +331,61 @@ class Gibbs():
         print ("\nCalculating the probability of the randomly selected --", "location", "--\n")
         _ = self.markov_Blanket('location')
 
-        nonevidList.update(inpevidenceList)
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
         totalList = nonevidList
-        print ("Complete List -- ", totalList)
+        #print ("Complete List -- ", totalList)
 
         prob_locationNewnoNorm, prob_locationNewNormal = {}, {}
-
         for loc_nodeOption in self.locOptions:
+            print(loc_nodeOption)
             prob_locationNewnoNorm[loc_nodeOption] = self.CPT_location(loc_nodeOption, totalList['amenities'], totalList['neighborhood'])\
                             *self.CPT_amentiies(totalList['amenities'])*self.CPT_neighbor(totalList['neighborhood'])*\
                             self.CPT_size(totalList['size'])*self.CPT_schools(totalList['schools'], totalList['children'])\
                             *self.CPT_age(totalList['age'], loc_nodeOption)*self.CPT_price(totalList['price'],\
                             loc_nodeOption, totalList['age'], totalList['schools'], totalList['size'])
-
+        
+        #p(location|amenities,neighborhood)*p()
         summ = sum(list(prob_locationNewnoNorm.values()))
         for key in list(prob_locationNewnoNorm.keys()):
             prob_locationNewNormal[key] = prob_locationNewnoNorm[key]/summ
 
         print ("Probability distribution of the -- Location -- node without normalization", prob_locationNewnoNorm)
         print ("Probability distribution of the -- Location -- node with normalization", prob_locationNewNormal)
+        
+        Update_value = np.random.choice(['good','bad','ugly'],p=[prob_locationNewNormal['good'],prob_locationNewNormal['bad'],prob_locationNewNormal['ugly']])
+        print(Update_value)
+        return Update_value
 
-        return 0
 
+    def amenities_location(self, nonevidList, inpevidenceList):
+
+        '''Calculate the probability distribution for amenities node based on Markov Blanket and then
+           normalizing it to get it within the 0-1 range '''
+        
+        print ("\nCalculating the probability of the randomly selected --", "amenities", "--\n")
+        _ = self.markov_Blanket('amenities')
+
+        nonevidList.update(inpevidenceList) #Concatenates nonevidence and input evidence lists
+        totalList = nonevidList
+        print(totalList['amenities'])
+        #print ("Complete List -- ", totalList)
+
+        prob_amenitiesNewnoNorm, prob_amenitiesNewNormal = {}, {}
+        for amn_nodeOption in self.amenitiesOptions:
+            prob_amenitiesNewnoNorm[amn_nodeOption] = self.CPT_location(totalList['location'], amn_nodeOption, totalList['neighborhood'])\
+                            *self.CPT_amentiies(amn_nodeOption)*self.CPT_neighbor(totalList['neighborhood'])
+        
+        #p(location|amenities,neighborhood)*p()
+        summ = sum(list(prob_amenitiesNewnoNorm.values()))
+        for key in list(prob_amenitiesNewnoNorm.keys()):
+            prob_amenitiesNewNormal[key] = prob_amenitiesNewnoNorm[key]/summ
+
+        print ("Probability distribution of the -- amenities -- node without normalization", prob_amenitiesNewnoNorm)
+        print ("Probability distribution of the -- amenities -- node with normalization", prob_amenitiesNewNormal)
+        
+        Update_value = np.random.choice(['lots','little'],p=[prob_amenitiesNewNormal['lots'],prob_amenitiesNewNormal['little']])
+        print(Update_value)
+        return Update_value
 
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
 
@@ -362,6 +395,7 @@ def main():
 
     allValues_noevidList = list(nonevidList.values())
     allValues_noevidList = list(nonevidList.keys())
+    allValues_length = len(allValues_noevidList)
 
     allValues_evidList = list(inpevidenceList.values())
     allValues_evidList = list(inpevidenceList.keys())
@@ -373,11 +407,20 @@ def main():
     print ("Number of updates  -- ", numUpdates)
     print ("Number of initial samples to ignore -- ", numSampleIgnr )
     print ("---------------\n")
-
+    
+    iterated_nodeList = {}
+    
+    
+#    while (len(list(iterated_nodeList)) != allValues_length):
+#        randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
+#        if not randomNode in iterated_nodeList.keys():
+#            iterated_nodeList[randomNode] = 'node'
+        
     randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
-
-    if randomNode== 'location':
-        _ = gibbs_obj.probability_location(nonevidList, inpevidenceList)
-
+    randomNode = 'amenities'
+    if randomNode== 'amenities':
+        New_Node_Val = gibbs_obj.amenities_location(nonevidList, inpevidenceList)
+        nonevidList[randomNode] = New_Node_Val
+        
 main()
 
