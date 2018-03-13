@@ -595,20 +595,53 @@ def main():
     print ("Number of updates  -- ", numUpdates)
     print ("Number of initial samples to ignore -- ", numSampleIgnr )
     print ("---------------\n")
+    print(list(nonevidList.values()))
     
-    iterated_nodeList = {}
-    
-    
-#    while (len(list(iterated_nodeList)) != allValues_length):
-#        randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
-#        if not randomNode in iterated_nodeList.keys():
-#            iterated_nodeList[randomNode] = 'node'
-        
-    randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
-    randomNode = 'price'
-    if randomNode== 'price':
-        New_Node_Val = gibbs_obj.probability_price(nonevidList, inpevidenceList)
-        nonevidList[randomNode] = New_Node_Val
+    for counter in range(0,numUpdates):
+        iterated_nodeList = {} 
+        while (len(list(iterated_nodeList)) != allValues_length):
+            randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
+            if not randomNode in iterated_nodeList.keys():
+                iterated_nodeList[randomNode] = 'status: iterated'
+                if randomNode== 'amenities':
+                    New_Node_Val = gibbs_obj.probability_amenities(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] 
+                    
+                elif randomNode== 'neighborhood':
+                    New_Node_Val = gibbs_obj.probability_neighborhood(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'location':
+                    New_Node_Val = gibbs_obj.probability_location(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'size':
+                    New_Node_Val = gibbs_obj.probability_size(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'children':
+                    New_Node_Val = gibbs_obj.probability_children(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'schools':
+                    New_Node_Val = gibbs_obj.probability_schools(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'age':
+                    New_Node_Val = gibbs_obj.probability_age(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+                    
+                elif randomNode== 'price':
+                    New_Node_Val = gibbs_obj.probability_price(nonevidList, inpevidenceList)
+                    nonevidList[randomNode] = New_Node_Val
+    print(iterated_nodeList)
+    print(nonevidList)   
         
 main()
+
+    
+
+
+
+
 
