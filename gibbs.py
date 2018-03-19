@@ -6,6 +6,7 @@ import sys
 import random
 from collections import Counter
 import time
+from matplotlib import pyplot as plt
 
 class Gibbs():
 
@@ -25,15 +26,19 @@ class Gibbs():
                     Price        price=cheap OR ok OR expensive            Age             age=old OR new
 
                     Command line Inputs - Optional values
-                    Giving the values of evidence nodes to be set at the start of the sampling process -e1 -e2 -e3 -e4 -e5 -e6 -e7 -e8
+                    Evidence Nodes can be entered without a prefix
+                    
 
     --Integer Input
     NumUpdates      - Number of Updates to be done                                                            -u
     NumSampleIgnr   - Number of Initial Samples to be ignored before computing the final probability          -d
+    [Prefix Required for no. of updates and ignored no. of samples]
 
     -- Input Syntax
-    gibbs.py [-h] [-e1 E1] [-e2 E2] [-e3 E3] [-e4 E4] [-e5 E5] [-e6 E6] [-e7 E7] [-e8 E8] [-u U] [-d D]
+    gibbs.py [-h] [E1] [E2] [E3] [E4] [E5] [E6] [E7] [E8] [-u U] [-d D]
 
+    -- Example Input command
+    python3 gibbs.py location neighborhood=good amenities=lots -u 10000 -d 500
     '''
 
     def __init__(self):
@@ -61,7 +66,7 @@ class Gibbs():
         self.ageStates = {}
         self.priceStates = {}
         self.evidLis = []
-
+        
     def read_argument(self):
 
         parser = argparse.ArgumentParser(description='Parse various common line arguments')
@@ -576,11 +581,12 @@ class Gibbs():
     def calculate_probability(self):
         
         checkingNode = self.QueryNode
+        IgnoredSamples = int(self.numSampleIgnr/(len(self.allNodes) - len(list(self.inpevidenceList))))
         if checkingNode == 'amenities':
             
             ''' Magic line: ignores the given no. of initial observations (defaults to 0 if value not given) 
                      [note: list does not need to be sorted, but can be sorted if required]'''
-            stateList = Counter({k: self.amenitiesStates[k] for k in list(self.amenitiesStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.amenitiesStates[k] for k in list(self.amenitiesStates)[IgnoredSamples:]}.values())
             
             #Normalizing the readings to obtain probability of state
             lots = stateList['lots']/float(stateList['lots']+stateList['little'])
@@ -589,14 +595,14 @@ class Gibbs():
             
         elif checkingNode == 'neighborhood':
             
-            stateList = Counter({k: self.checkingStates[k] for k in list(self.checkingStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.neighborhoodStates[k] for k in list(self.neighborhoodStates)[IgnoredSamples:]}.values())
             bad = stateList['bad']/float(stateList['bad']+stateList['good'])
             good = stateList['good']/float(stateList['bad']+stateList['good'])
             print('Probabilities of states of node -neighborhood- are --> \nbad: ',bad,'  \ngood: ',good)
         
         elif checkingNode == 'location':
             
-            stateList = Counter({k: self.locationStates[k] for k in list(self.locationStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.locationStates[k] for k in list(self.locationStates)[IgnoredSamples:]}.values())
             bad = stateList['bad']/float(stateList['bad']+stateList['good']+stateList['ugly'])
             good = stateList['good']/float(stateList['bad']+stateList['good']+stateList['ugly'])
             ugly = stateList['ugly']/float(stateList['bad']+stateList['good']+stateList['ugly'])
@@ -604,38 +610,38 @@ class Gibbs():
 
         elif checkingNode == 'children':
             
-            stateList = Counter({k: self.childrenStates[k] for k in list(self.childrenStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.childrenStates[k] for k in list(self.childrenStates)[IgnoredSamples:]}.values())
             bad = stateList['bad']/float(stateList['bad']+stateList['good'])
             good = stateList['good']/float(stateList['bad']+stateList['good'])
             print('Probabilities of states of node -children- are --> \nbad: ',bad,'  \ngood: ',good)
             
         elif checkingNode == 'size':
             
-            stateList = Counter({k: self.sizeStates[k] for k in list(self.sizeStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.sizeStates[k] for k in list(self.sizeStates)[IgnoredSamples:]}.values())
             small = stateList['small']/float(stateList['small']+stateList['medium']+stateList['large'])
             medium = stateList['medium']/float(stateList['small']+stateList['medium']+stateList['large'])
             large = stateList['large']/float(stateList['small']+stateList['medium']+stateList['large'])
             print('Probabilities of states of node -size- are --> \nsmall: ',small,'  \nmedium: ',medium, '\nlarge: ',large)
             
         elif checkingNode == 'schools':
-            stateList = Counter({k: self.schoolsStates[k] for k in list(self.schoolsStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.schoolsStates[k] for k in list(self.schoolsStates)[IgnoredSamples:]}.values())
             bad = stateList['bad']/float(stateList['bad']+stateList['good'])
             good = stateList['good']/float(stateList['bad']+stateList['good'])
             print('Probabilities of states of node -schools- are --> \nbad: ',bad,'  \ngood: ',good)
  
         elif checkingNode == 'age':
-            stateList = Counter({k: self.ageStates[k] for k in list(self.ageStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.ageStates[k] for k in list(self.ageStates)[IgnoredSamples:]}.values())
             old = stateList['old']/float(stateList['old']+stateList['new'])
             new = stateList['new']/float(stateList['old']+stateList['new'])
             print('Probabilities of states of node -children- are --> \nold: ',old,'  \nnew: ',new) 
             
         elif checkingNode == 'price':
-            stateList = Counter({k: self.priceStates[k] for k in list(self.priceStates)[self.numSampleIgnr:]}.values())
+            stateList = Counter({k: self.priceStates[k] for k in list(self.priceStates)[IgnoredSamples:]}.values())
             cheap = stateList['cheap']/float(stateList['cheap']+stateList['ok']+stateList['expensive'])
             ok = stateList['ok']/float(stateList['cheap']+stateList['ok']+stateList['expensive'])
             expensive = stateList['expensive']/float(stateList['cheap']+stateList['ok']+stateList['expensive'])
             print('Probabilities of states of node -price- are --> \ncheap: ',cheap,'  \nok: ',ok, '\nexpensive: ',expensive)
-        
+
         
 #Defining the main function that creates the object for the Class and does some shit - This needs to be structured better
 
@@ -665,15 +671,20 @@ def main():
     print("Iterating over non-evidence nodes for ",IterationTimes," iterations, Updating probabilities of non-evidence nodes and sampling the states\n")
     print ("---------------\n")
     
+    '''[NOTE: Since we iterate through all nodes, number of updates will be divided by No. of evidence nodes]'''
+    
+    #No. of updates can be calculated as follows:
+    UpdateNum = int(IterationTimes/allValues_length)
+    
     start = time.time()
-    for counter in range(0,IterationTimes):
+    for counter in range(0,UpdateNum):
 
         #Temporary nodelist to keep track of iterated nodes and prevent multiple iterations in a single loop
         iterated_nodeList = {} 
         
         #Checks length of temporary list to match it with the main list, equal length means iteration over all non-evidence nodes is complete
         while (len(list(iterated_nodeList)) != allValues_length):
-            
+            #counter += 1
             #Select a random node based on random probability, eventually iterate through all nodes with the loop
             randomNode = allValues_noevidList[random.randint(0, len(allValues_noevidList)-1)]
             if not randomNode in iterated_nodeList.keys():
@@ -730,7 +741,7 @@ def main():
     gibbs_obj.calculate_probability()
     end = time.time()
     print('\nElapsed time - ',end-start,' seconds')
-    
+
 main()
 
     
