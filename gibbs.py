@@ -312,27 +312,7 @@ class Gibbs():
         # print ("Evidence List", self.inpevidenceList)
         return newdict, self.inpevidenceList, self.numUpdates, self.numSampleIgnr, self.QueryNode
 
-
-    #Still pondering over this node - I DO NOT REMEMBER IF THIS IS TO BE USED
-    def updateNodeValues(self, node):
-
-        marblank = self.markov_Blanket(node)
-        return marblank
-
-    #As the description suggests
-    #Need to fill in these two functions after all the individual probability distribution functions are made
-
-    # def calcProbSequence(self, nonevidList, inpevidenceList):
-    #     '''Calculates probability based on sequential selection of all the non-evidence nodes'''
-    #
-    # def calcProbRand(self, randNode, nonevidList, inpevidenceList):
-    #     ''' Calculates probability based on random node selection for udpate'''
-
-
     #Defining the functions for all the nodes to update their probability distribution for random assignment conditioned on the Markov Blanket
-
-    #For Location - Other Nodes to complete
-
     def probability_location(self, nonevidList, inpevidenceList):
 
         '''Calculate the probability distribution for location node based on Markov Blanket and then
